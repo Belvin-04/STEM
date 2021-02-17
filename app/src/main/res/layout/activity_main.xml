@@ -67,9 +67,11 @@
         app:layout_constraintTop_toBottomOf="@id/resistor" />
 
     <EditText
+        android:inputType="number|numberDecimal"
         android:id="@+id/resistanceValue"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/unit"
         app:layout_constraintBottom_toBottomOf="@id/resistanceText"
         app:layout_constraintStart_toEndOf="@id/resistanceText"
         app:layout_constraintTop_toTopOf="@id/resistanceText" />
@@ -81,7 +83,7 @@
         android:textColor="@color/black"
         android:textSize="25sp"
         app:layout_constraintBottom_toBottomOf="@id/resistanceText"
-        app:layout_constraintStart_toEndOf="@id/resistanceValue" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/toleranceText"
@@ -94,7 +96,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/resistanceText" />
 
-    <EditText
+    <Spinner
         android:id="@+id/toleranceValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
