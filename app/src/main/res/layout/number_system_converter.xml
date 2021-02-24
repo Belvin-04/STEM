@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".NumberSystemConverter">
+
+    <TextView
+        android:id="@+id/decimalText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20sp"
+        android:text="Decimal: "
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/decimalValue"
+        android:layout_width="0dp"
+        android:inputType="number"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/decimalText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/decimalText"
+        app:layout_constraintTop_toTopOf="@id/decimalText" />
+
+    <TextView
+        android:id="@+id/binaryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20sp"
+        android:text="Binary: "
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/decimalValue" />
+
+    <EditText
+        android:inputType="number"
+        android:digits="01"
+        android:id="@+id/binaryValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/binaryText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/binaryText"
+        app:layout_constraintTop_toTopOf="@id/binaryText" />
+
+    <TextView
+        android:id="@+id/octalText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20sp"
+        android:text="Octal: "
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/binaryValue" />
+
+    <EditText
+        android:inputType="number"
+        android:digits="01234567"
+        android:id="@+id/octalValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/octalText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/octalText"
+        app:layout_constraintTop_toTopOf="@id/octalText" />
+
+    <TextView
+        android:id="@+id/hexDecText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20sp"
+        android:text="HexaDecimal: "
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/octalValue" />
+
+    <EditText
+        android:id="@+id/hexDecValue"
+        android:digits="ABCDEFabcdef0123456789"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/hexDecText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/hexDecText"
+        app:layout_constraintTop_toTopOf="@id/hexDecText" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,21 +1,31 @@
 package com.belvin.stem
 
-import android.graphics.drawable.Drawable
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.*
+import androidx.annotation.RequiresApi
 import kotlin.math.pow
 
-class MainActivity : AppCompatActivity() {
+class ResistorCalculator : AppCompatActivity() {
+    val CAMERA_REQUEST = 1888
+    val MY_CAMERA_PERMISSION_CODE = 100
     lateinit var fBand:ImageView
     lateinit var sBand:ImageView
     lateinit var tBand:ImageView
     lateinit var foBand:ImageView
+    lateinit var cameraImg:ImageView
     lateinit var resistanceValue:EditText
     lateinit var toleranceSpinner:Spinner
     lateinit var calculateButton: Button
     lateinit var unitSpinner:Spinner
+    lateinit var cameraBtn:Button
     var fBandNo = 0
     var sBandNo = 0
     var tBandNo = 0
@@ -26,9 +36,10 @@ class MainActivity : AppCompatActivity() {
     val toleranceBandArray = arrayOf(R.drawable.brown,R.drawable.red,R.drawable.green,R.drawable.blue,R.drawable.violet,R.drawable.grey,R.drawable.gold,R.drawable.silver)
     val unitArray = arrayOf("Ohms","K Ohms","M Ohms","G Ohms")
     val toleranceArray = arrayOf("1%","2%","0.5%","0.25%","0.10%","0.05%","5%","10%")
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.resistor_calculator)
 
         fBand = findViewById(R.id.f_band)
         sBand = findViewById(R.id.s_band)
@@ -38,6 +49,8 @@ class MainActivity : AppCompatActivity() {
         toleranceSpinner = findViewById(R.id.toleranceValue)
         calculateButton = findViewById(R.id.calculateBtn)
         unitSpinner = findViewById(R.id.unit)
+        cameraBtn = findViewById(R.id.cameraBtn)
+        cameraImg = findViewById(R.id.cameraImg)
 
         unitSpinner.adapter = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,unitArray)
         toleranceSpinner.adapter = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,toleranceArray)
@@ -61,6 +74,10 @@ class MainActivity : AppCompatActivity() {
 
         calculateButton.setOnClickListener {
             userCalculate()
+        }
+
+        cameraBtn.setOnClickListener {
+            openCamera()
         }
 
     }
@@ -151,5 +168,38 @@ class MainActivity : AppCompatActivity() {
                 this.resistanceValue.setText(newResistanceValue.toString())
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun openCamera() {
+
+        if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(arrayOf(Manifest.permission.CAMERA),MY_CAMERA_PERMISSION_CODE)
+        }
+        else{
+            val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(intent,CAMERA_REQUEST)
+        }
+
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if(requestCode == MY_CAMERA_PERMISSION_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(intent,CAMERA_REQUEST)
+        }
+        else{
+            Toast.makeText(this, "Please accept all permissions", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK){
+            val photo = data?.extras?.get("data") as Bitmap
+            cameraImg.setImageBitmap(photo)
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }
