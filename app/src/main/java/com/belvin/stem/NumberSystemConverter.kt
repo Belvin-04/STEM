@@ -12,6 +12,10 @@ class NumberSystemConverter : AppCompatActivity() {
     lateinit var binaryValue:EditText
     lateinit var octalValue:EditText
     lateinit var hexDecValue:EditText
+    lateinit var decimalTextWatcher: TextWatcher
+    lateinit var binaryTextWatcher: TextWatcher
+    lateinit var octalTextWatcher: TextWatcher
+    lateinit var hexTextWatcher: TextWatcher
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.number_system_converter)
@@ -21,9 +25,9 @@ class NumberSystemConverter : AppCompatActivity() {
         octalValue = findViewById(R.id.octalValue)
         hexDecValue = findViewById(R.id.hexDecValue)
 
-        /*decimalValue.addTextChangedListener(object:TextWatcher{
+        decimalTextWatcher = object:TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
+                removeListeners("Decimal")
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -40,14 +44,13 @@ class NumberSystemConverter : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-
+                addListeners("Decimal")
             }
-        })
+        }
 
-
-        binaryValue.addTextChangedListener(object:TextWatcher{
+        binaryTextWatcher = object:TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
+                removeListeners("Binary")
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -65,14 +68,14 @@ class NumberSystemConverter : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-
+                addListeners("Binary")
             }
 
-        })
+        }
 
-        octalValue.addTextChangedListener(object:TextWatcher{
+        octalTextWatcher = object:TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
+                removeListeners("Octal")
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -89,13 +92,13 @@ class NumberSystemConverter : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-
+                addListeners("Octal")
             }
-        })*/
+        }
 
-        hexDecValue.addTextChangedListener(object:TextWatcher{
+        hexTextWatcher = object:TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
+                removeListeners("HEX")
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -111,9 +114,14 @@ class NumberSystemConverter : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-
+                addListeners("HEX")
             }
-        })
+        }
+
+        decimalValue.addTextChangedListener(decimalTextWatcher)
+        binaryValue.addTextChangedListener(binaryTextWatcher)
+        octalValue.addTextChangedListener(octalTextWatcher)
+        hexDecValue.addTextChangedListener(hexTextWatcher)
     }
 
     fun decimalToBinary(num:Long):String{
@@ -266,5 +274,52 @@ class NumberSystemConverter : AppCompatActivity() {
             tempArray.add(c.toString())
         }
         return  tempArray
+    }
+
+    fun removeListeners(s:String){
+
+        if(s == "Decimal"){
+            binaryValue.removeTextChangedListener(binaryTextWatcher)
+            octalValue.removeTextChangedListener(octalTextWatcher)
+            hexDecValue.removeTextChangedListener(hexTextWatcher)
+        }
+        else if(s == "Binary"){
+            decimalValue.removeTextChangedListener(decimalTextWatcher)
+            octalValue.removeTextChangedListener(octalTextWatcher)
+            hexDecValue.removeTextChangedListener(hexTextWatcher)
+        }
+        else if(s == "Octal"){
+            binaryValue.removeTextChangedListener(binaryTextWatcher)
+            decimalValue.removeTextChangedListener(decimalTextWatcher)
+            hexDecValue.removeTextChangedListener(hexTextWatcher)
+        }
+        else{
+            binaryValue.removeTextChangedListener(binaryTextWatcher)
+            octalValue.removeTextChangedListener(octalTextWatcher)
+            decimalValue.removeTextChangedListener(decimalTextWatcher)
+        }
+    }
+
+    fun addListeners(s:String){
+        if(s == "Decimal"){
+            binaryValue.addTextChangedListener(binaryTextWatcher)
+            octalValue.addTextChangedListener(octalTextWatcher)
+            hexDecValue.addTextChangedListener(hexTextWatcher)
+        }
+        else if(s == "Binary"){
+            decimalValue.addTextChangedListener(decimalTextWatcher)
+            octalValue.addTextChangedListener(octalTextWatcher)
+            hexDecValue.addTextChangedListener(hexTextWatcher)
+        }
+        else if(s == "Octal"){
+            binaryValue.addTextChangedListener(binaryTextWatcher)
+            decimalValue.addTextChangedListener(decimalTextWatcher)
+            hexDecValue.addTextChangedListener(hexTextWatcher)
+        }
+        else{
+            binaryValue.addTextChangedListener(binaryTextWatcher)
+            octalValue.addTextChangedListener(octalTextWatcher)
+            decimalValue.addTextChangedListener(decimalTextWatcher)
+        }
     }
 }
