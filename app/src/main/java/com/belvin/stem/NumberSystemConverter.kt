@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
+import com.google.android.material.textfield.TextInputLayout
 import kotlin.math.pow
 
 class NumberSystemConverter : AppCompatActivity() {
@@ -20,10 +21,10 @@ class NumberSystemConverter : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.number_system_converter)
 
-        decimalValue = findViewById(R.id.decimalValue)
-        binaryValue = findViewById(R.id.binaryValue)
-        octalValue = findViewById(R.id.octalValue)
-        hexDecValue = findViewById(R.id.hexDecValue)
+        decimalValue = findViewById<TextInputLayout>(R.id.decimalValue).editText!!
+        binaryValue = findViewById<TextInputLayout>(R.id.binaryValue).editText!!
+        octalValue = findViewById<TextInputLayout>(R.id.octalValue).editText!!
+        hexDecValue = findViewById<TextInputLayout>(R.id.hexDecValue).editText!!
 
         decimalTextWatcher = object:TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {

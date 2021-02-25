@@ -9,8 +9,10 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.widget.*
 import androidx.annotation.RequiresApi
+import com.google.android.material.textfield.TextInputLayout
 import kotlin.math.pow
 
 class ResistorCalculator : AppCompatActivity() {
@@ -45,7 +47,7 @@ class ResistorCalculator : AppCompatActivity() {
         sBand = findViewById(R.id.s_band)
         tBand = findViewById(R.id.t_band)
         foBand = findViewById(R.id.fo_band)
-        resistanceValue = findViewById(R.id.resistanceValue)
+        resistanceValue = findViewById<TextInputLayout>(R.id.resistanceValue).editText!!
         toleranceSpinner = findViewById(R.id.toleranceValue)
         calculateButton = findViewById(R.id.calculateBtn)
         unitSpinner = findViewById(R.id.unit)
@@ -89,7 +91,7 @@ class ResistorCalculator : AppCompatActivity() {
         }
 
         else{
-            var resistanceValueUser = resistanceValue.text.toString().toFloat()
+            var resistanceValueUser = resistanceValue.text.toString().toDouble()
 
             if(unitSpinner.selectedItem == "K Ohms"){
                 resistanceValueUser *= 1000
@@ -104,6 +106,7 @@ class ResistorCalculator : AppCompatActivity() {
             if(resistanceValueUser > 99000000000){
                 resistanceValue.error = "Value too large"
             }
+
 
             else{
                 var fBandValue = (resistanceValueUser.toString()[0]).toString().toInt()
