@@ -27,6 +27,9 @@ class ModuleAdapter(var modules:Array<String>): RecyclerView.Adapter<ModuleAdapt
             else if(text == "Number System Converter"){
                 parent.context.startActivity(Intent(parent.context,NumberSystemConverter::class.java))
             }
+            else if(text == "K-Map Solver"){
+                parent.context.startActivity(Intent(parent.context,KMapSolver::class.java))
+            }
         }
         return ViewHolder(myView)
     }
