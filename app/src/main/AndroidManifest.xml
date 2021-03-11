@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.STEM">
-        <activity android:name=".KMapSolver"></activity>
+        <activity android:name=".NumberSystemGameMode"></activity>
+        <activity android:name=".KMapSolver" />
         <activity android:name=".Home">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".NumberSystemConverter" />
-        <activity android:name=".ResistorCalculator"></activity>
+        <activity android:name=".ResistorCalculator" />
     </application>
 
 </manifest>
