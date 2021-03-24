@@ -337,6 +337,9 @@ class NumberSystemConverter : AppCompatActivity() {
             R.id.numberSystemTest -> {
                 startActivity(Intent(this,NumberSystemGameMode::class.java))
             }
+            R.id.numberSystemVisualize -> {
+                startActivity(Intent(this,NumberSystemLearn::class.java))
+            }
         }
         return super.onOptionsItemSelected(item)
     }

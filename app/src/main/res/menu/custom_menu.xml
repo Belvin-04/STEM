@@ -4,4 +4,9 @@
         android:id="@+id/numberSystemTest"
         android:title="Test your skill"
         />
+
+    <item
+        android:id="@+id/numberSystemVisualize"
+        android:title="Learn"
+        />
 </menu>

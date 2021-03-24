@@ -30,6 +30,9 @@ class ModuleAdapter(var modules:Array<String>): RecyclerView.Adapter<ModuleAdapt
             else if(text == "K-Map Solver"){
                 parent.context.startActivity(Intent(parent.context,KMapSolver::class.java))
             }
+            else if(text == "Matrix"){
+                parent.context.startActivity(Intent(parent.context,MatrixSolver::class.java))
+            }
         }
         return ViewHolder(myView)
     }

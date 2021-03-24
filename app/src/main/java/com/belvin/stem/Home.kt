@@ -11,7 +11,7 @@ class Home : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home)
 
-        var modulesArray = arrayOf("Resistor Calculator","Number System Converter","K-Map Solver")
+        var modulesArray = arrayOf("Resistor Calculator","Number System Converter","K-Map Solver","Matrix")
         moduleRecyclerView = findViewById(R.id.moduleRecyclerView)
 
         moduleRecyclerView.layoutManager = LinearLayoutManager(this)
