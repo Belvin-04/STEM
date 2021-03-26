@@ -1,6 +1,9 @@
 package com.belvin.stem
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -257,5 +260,22 @@ class MatrixSolver : AppCompatActivity() {
                 ansMatrix[i][j]!!.setText(ans[i][j].toString())
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.matrix_menu,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when(item.itemId){
+            R.id.matrixMethod -> {
+                startActivity(Intent(this,InverseMatrixMethod::class.java))
+            }
+            R.id.matrixQuiz -> {}
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 }
