@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.STEM">
-        <activity android:name=".InverseMatrixMethod"></activity>
+        <activity android:name=".MatrixQuiz"></activity>
+        <activity android:name=".InverseMatrixMethod" />
         <activity android:name=".MatrixSolver" />
         <activity android:name=".NumberSystemLearn" />
         <activity android:name=".NumberSystemGameMode" />

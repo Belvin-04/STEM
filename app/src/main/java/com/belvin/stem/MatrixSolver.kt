@@ -273,7 +273,9 @@ class MatrixSolver : AppCompatActivity() {
             R.id.matrixMethod -> {
                 startActivity(Intent(this,InverseMatrixMethod::class.java))
             }
-            R.id.matrixQuiz -> {}
+            R.id.matrixQuiz -> {
+                startActivity(Intent(this,MatrixQuiz::class.java))
+            }
         }
 
         return super.onOptionsItemSelected(item)
