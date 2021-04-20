@@ -364,8 +364,7 @@ class NumberSystemConverter : AppCompatActivity() {
             requestPermissions(arrayOf(Manifest.permission.CAMERA), MY_CAMERA_PERMISSION_CODE)
         }
         else{
-            val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(intent, CAMERA_REQUEST)
+            CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
         }
 
     }
@@ -378,8 +377,7 @@ class NumberSystemConverter : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if(requestCode == MY_CAMERA_PERMISSION_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-            val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(intent, CAMERA_REQUEST)
+            CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
         }
         else{
             Toast.makeText(this, "Please accept all permissions", Toast.LENGTH_SHORT).show()
@@ -430,7 +428,12 @@ class NumberSystemConverter : AppCompatActivity() {
         when(item.itemId){
             R.id.scanQues -> {
 
-                CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
+                if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                    requestPermissions(arrayOf(Manifest.permission.CAMERA),MY_CAMERA_PERMISSION_CODE)
+                }
+                else{
+                    CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
+                }
 
                 /*val filename = System.currentTimeMillis().toString() + ".jpg"
 

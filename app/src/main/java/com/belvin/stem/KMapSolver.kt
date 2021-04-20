@@ -2,14 +2,19 @@ package com.belvin.stem
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
@@ -17,7 +22,16 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import com.google.android.gms.vision.Frame
+import com.google.android.gms.vision.text.TextBlock
+import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.textfield.TextInputLayout
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.io.InputStream
+import java.util.*
 
 class KMapSolver : AppCompatActivity() {
 
@@ -197,8 +211,7 @@ class KMapSolver : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if(requestCode == MY_CAMERA_PERMISSION_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(intent,CAMERA_REQUEST)
+            CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
         }
         else{
             Toast.makeText(this, "Please accept all permissions", Toast.LENGTH_SHORT).show()
@@ -206,9 +219,18 @@ class KMapSolver : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK){
-            val photo = data?.extras?.get("data") as Bitmap
+        when(requestCode){
+            CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
+                val result = CropImage.getActivityResult(data)
+                if (resultCode === RESULT_OK) {
+                    val resultUri = result.uri
 
+                    inspect(resultUri)
+                    //From here you can load the image however you need to, I recommend using the Glide library
+                } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    val error = result.error
+                }
+            }
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
@@ -218,12 +240,103 @@ class KMapSolver : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.scanQues -> {
-                openCamera()
+                if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                    requestPermissions(arrayOf(Manifest.permission.CAMERA),MY_CAMERA_PERMISSION_CODE)
+                }
+                else{
+                    CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
+                }
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun inspectFromBitmap(bitmap: Bitmap?) {
+        val textRecognizer = TextRecognizer.Builder(this).build()
+        try {
+            if (!textRecognizer.isOperational) {
+                AlertDialog.Builder(this)
+                    .setMessage("Text recognizer could not be set up on your device").show()
+                return
+            }
+            val frame = Frame.Builder().setBitmap(bitmap).build()
+            val origTextBlocks = textRecognizer.detect(frame)
+            val textBlocks: MutableList<TextBlock> = ArrayList()
+            for (i in 0 until origTextBlocks.size()) {
+                val textBlock = origTextBlocks.valueAt(i)
+                textBlocks.add(textBlock)
+            }
+            Collections.sort(textBlocks, object : Comparator<TextBlock?> {
+                override fun compare(o1: TextBlock?, o2: TextBlock?): Int {
+                    val diffOfTops = o1!!.boundingBox.top - o2!!.boundingBox.top
+                    val diffOfLefts = o1.boundingBox.left - o2.boundingBox.left
+                    return if (diffOfTops != 0) {
+                        diffOfTops
+                    } else diffOfLefts
+                }
+            })
+            val detectedText = StringBuilder()
+            for (textBlock in textBlocks) {
+                if (textBlock != null && textBlock.value != null) {
+                    detectedText.append(textBlock.value)
+                    detectedText.append("\n")
+                }
+            }
+            processText(detectedText.toString())
+        } finally {
+            textRecognizer.release()
+        }
+    }
+
+    fun processText(extractedText: String){
+        var text = extractedText.trim()
+        var aa = text.split("\n")[0][0]
+        var ab = text.split("\n")[0][1]
+        var ba = text.split("\n")[1][0]
+        var bb = text.split("\n")[1][1]
+
+        aaValue.setText(aa.toString())
+        abValue.setText(ab.toString())
+        baValue.setText(ba.toString())
+        bbValue.setText(bb.toString())
+
+
+
+    }
+
+    private fun inspect(uri: Uri) {
+        var `is`: InputStream? = null
+        var bitmap: Bitmap? = null
+        try {
+            `is` = contentResolver.openInputStream(uri)
+            val options = BitmapFactory.Options()
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888
+            options.inSampleSize = 2
+            options.inScreenDensity = DisplayMetrics.DENSITY_LOW
+            bitmap = BitmapFactory.decodeStream(`is`, null, options)
+            inspectFromBitmap(bitmap)
+        } catch (e: FileNotFoundException) {
+            Log.w(
+                "LOG",
+                "Failed to find the file: $uri", e
+            )
+        } finally {
+            bitmap?.recycle()
+            if (`is` != null) {
+                try {
+                    `is`.close()
+                } catch (e: IOException) {
+                    Log.w(
+                        "LOG",
+                        "Failed to close InputStream",
+                        e
+                    )
+                }
+            }
+        }
     }
 }

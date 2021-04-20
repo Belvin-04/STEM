@@ -287,13 +287,7 @@ class MatrixSolver : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.M)
     fun openCamera() {
 
-        if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            requestPermissions(arrayOf(Manifest.permission.CAMERA),MY_CAMERA_PERMISSION_CODE)
-        }
-        else{
-            val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(intent,CAMERA_REQUEST)
-        }
+
 
     }
 
@@ -301,8 +295,7 @@ class MatrixSolver : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if(requestCode == MY_CAMERA_PERMISSION_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-            val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(intent,CAMERA_REQUEST)
+            CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
         }
         else{
             Toast.makeText(this, "Please accept all permissions", Toast.LENGTH_SHORT).show()
@@ -340,7 +333,12 @@ class MatrixSolver : AppCompatActivity() {
                 startActivity(Intent(this,InverseMatrixMethod::class.java))
             }
             R.id.scanMatrix -> {
-                CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
+                if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                    requestPermissions(arrayOf(Manifest.permission.CAMERA),MY_CAMERA_PERMISSION_CODE)
+                }
+                else{
+                    CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
+                }
             }
         }
 

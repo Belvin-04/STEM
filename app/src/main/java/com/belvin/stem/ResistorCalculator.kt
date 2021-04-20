@@ -252,6 +252,7 @@ class ResistorCalculator : AppCompatActivity() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -260,8 +261,12 @@ class ResistorCalculator : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode == MY_CAMERA_PERMISSION_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(intent, CAMERA_REQUEST)
+            if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(arrayOf(Manifest.permission.CAMERA),MY_CAMERA_PERMISSION_CODE)
+            }
+            else{
+                CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
+            }
         } else {
             Toast.makeText(this, "Please accept all permissions", Toast.LENGTH_SHORT).show()
         }
@@ -351,7 +356,12 @@ class ResistorCalculator : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.scanQues -> {
-                CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
+                if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                    requestPermissions(arrayOf(Manifest.permission.CAMERA),MY_CAMERA_PERMISSION_CODE)
+                }
+                else{
+                    CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
+                }
             }
         }
         return super.onOptionsItemSelected(item)
