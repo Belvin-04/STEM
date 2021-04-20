@@ -1,17 +1,47 @@
 package com.belvin.stem
 
+import android.Manifest
+import android.R.attr
+import android.app.AlertDialog
+import android.content.ContentValues
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.EditText
+import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import com.belvin.stem.TessOCR.DATA_PATH
+import com.google.android.gms.vision.Frame
+import com.google.android.gms.vision.text.TextBlock
+import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.textfield.TextInputLayout
+import com.googlecode.tesseract.android.TessBaseAPI
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.io.InputStream
+import java.util.*
 import kotlin.math.pow
 
+
 class NumberSystemConverter : AppCompatActivity() {
+    var REQUEST_CAMERA = 1111
+    val CAMERA_REQUEST = 1888
+    lateinit var imageUri:Uri;
+    val MY_CAMERA_PERMISSION_CODE = 100
     lateinit var decimalValue:EditText
     lateinit var binaryValue:EditText
     lateinit var octalValue:EditText
@@ -128,7 +158,7 @@ class NumberSystemConverter : AppCompatActivity() {
         hexDecValue.addTextChangedListener(hexTextWatcher)
     }
 
-    fun decimalToBinary(num:Long):String{
+    fun decimalToBinary(num: Long):String{
         var n = num
         val binaryNum = mutableListOf<Long>()
         var binaryAns = ""
@@ -139,7 +169,7 @@ class NumberSystemConverter : AppCompatActivity() {
                 binaryNum.add(n)
                 break
             }
-            binaryNum.add(n%2)
+            binaryNum.add(n % 2)
             n /= 2
         }
 
@@ -161,7 +191,7 @@ class NumberSystemConverter : AppCompatActivity() {
                 octalNum.add(n)
                 break
             }
-            octalNum.add(n%8)
+            octalNum.add(n % 8)
             n /= 8
         }
 
@@ -173,7 +203,7 @@ class NumberSystemConverter : AppCompatActivity() {
 
     }
 
-    fun decimalToHEX(num:Long):String{
+    fun decimalToHEX(num: Long):String{
         var n = num
         val hexNum = mutableListOf<Any>()
         var hexAns = ""
@@ -203,7 +233,7 @@ class NumberSystemConverter : AppCompatActivity() {
                 hexNum.add("F")
             }
             else{
-                hexNum.add(n%16)
+                hexNum.add(n % 16)
             }
             n /= 16
         }
@@ -215,7 +245,7 @@ class NumberSystemConverter : AppCompatActivity() {
         return hexAns
     }
 
-    fun binaryToDecimal(num:String):String{
+    fun binaryToDecimal(num: String):String{
         var sum = 0
         var binaryArray = convertToList(num).asReversed()
 
@@ -227,7 +257,7 @@ class NumberSystemConverter : AppCompatActivity() {
         return (sum.toString())
     }
 
-    fun octalToDecimal(num:String):String{
+    fun octalToDecimal(num: String):String{
         var sum = 0
         var octalArray = convertToList(num).asReversed()
 
@@ -239,7 +269,7 @@ class NumberSystemConverter : AppCompatActivity() {
         return (sum.toString())
     }
 
-    fun hexToDecimal(num:String):String{
+    fun hexToDecimal(num: String):String{
         var sum = 0
         var hexDecArray = convertToList(num).asReversed()
 
@@ -272,7 +302,7 @@ class NumberSystemConverter : AppCompatActivity() {
         return (sum.toString())
     }
 
-    fun convertToList(chars:String):MutableList<String>{
+    fun convertToList(chars: String):MutableList<String>{
         var tempArray = mutableListOf<String>()
         for(c in chars){
             tempArray.add(c.toString())
@@ -280,7 +310,7 @@ class NumberSystemConverter : AppCompatActivity() {
         return  tempArray
     }
 
-    fun removeListeners(s:String){
+    fun removeListeners(s: String){
 
         if(s == "Decimal"){
             binaryValue.removeTextChangedListener(binaryTextWatcher)
@@ -304,7 +334,7 @@ class NumberSystemConverter : AppCompatActivity() {
         }
     }
 
-    fun addListeners(s:String){
+    fun addListeners(s: String){
         if(s == "Decimal"){
             binaryValue.addTextChangedListener(binaryTextWatcher)
             octalValue.addTextChangedListener(octalTextWatcher)
@@ -325,22 +355,192 @@ class NumberSystemConverter : AppCompatActivity() {
             octalValue.addTextChangedListener(octalTextWatcher)
             decimalValue.addTextChangedListener(decimalTextWatcher)
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun openCamera() {
+
+        if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(arrayOf(Manifest.permission.CAMERA), MY_CAMERA_PERMISSION_CODE)
+        }
+        else{
+            val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(intent, CAMERA_REQUEST)
+        }
+
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if(requestCode == MY_CAMERA_PERMISSION_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(intent, CAMERA_REQUEST)
+        }
+        else{
+            Toast.makeText(this, "Please accept all permissions", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun extractText(bitmap: Bitmap):String{
+        var tessBaseAPI = TessBaseAPI()
+        tessBaseAPI.init(DATA_PATH, "eng")
+        tessBaseAPI.setImage(bitmap)
+        var extractedText = tessBaseAPI.utF8Text
+        tessBaseAPI.end()
+        return extractedText
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            REQUEST_CAMERA -> if (resultCode == RESULT_OK) {
+                if (imageUri != null) {
+                    //inspect(imageUri)
+
+                }
+            }
+            CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
+                val result = CropImage.getActivityResult(data)
+                if (resultCode === RESULT_OK) {
+                    val resultUri = result.uri
+
+                    inspect(resultUri)
+                    //From here you can load the image however you need to, I recommend using the Glide library
+                } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    val error = result.error
+                }
+            }
+            else -> super.onActivityResult(requestCode, resultCode, data)
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.custom_menu,menu)
-        return true
+        menuInflater.inflate(R.menu.camera_menu, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         when(item.itemId){
-            R.id.numberSystemTest -> {
-                startActivity(Intent(this,NumberSystemGameMode::class.java))
-            }
-            R.id.numberSystemVisualize -> {
-                startActivity(Intent(this,NumberSystemLearn::class.java))
+            R.id.scanQues -> {
+
+                CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
+
+                /*val filename = System.currentTimeMillis().toString() + ".jpg"
+
+                val values = ContentValues()
+                values.put(MediaStore.Images.Media.TITLE, filename)
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                imageUri =
+                    contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)!!
+
+                val intent = Intent()
+                intent.action = MediaStore.ACTION_IMAGE_CAPTURE
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+                startActivityForResult(
+                    intent,
+                    REQUEST_CAMERA
+                )*/
             }
         }
+
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun inspectFromBitmap(bitmap: Bitmap?) {
+        val textRecognizer = TextRecognizer.Builder(this).build()
+        try {
+            if (!textRecognizer.isOperational) {
+                AlertDialog.Builder(this)
+                    .setMessage("Text recognizer could not be set up on your device").show()
+                return
+            }
+            val frame = Frame.Builder().setBitmap(bitmap).build()
+            val origTextBlocks = textRecognizer.detect(frame)
+            val textBlocks: MutableList<TextBlock> = ArrayList()
+            for (i in 0 until origTextBlocks.size()) {
+                val textBlock = origTextBlocks.valueAt(i)
+                textBlocks.add(textBlock)
+            }
+            Collections.sort(textBlocks, object : Comparator<TextBlock?> {
+                override fun compare(o1: TextBlock?, o2: TextBlock?): Int {
+                    val diffOfTops = o1!!.boundingBox.top - o2!!.boundingBox.top
+                    val diffOfLefts = o1.boundingBox.left - o2.boundingBox.left
+                    return if (diffOfTops != 0) {
+                        diffOfTops
+                    } else diffOfLefts
+                }
+            })
+            val detectedText = StringBuilder()
+            for (textBlock in textBlocks) {
+                if (textBlock != null && textBlock.value != null) {
+                    detectedText.append(textBlock.value)
+                    detectedText.append("\n")
+                }
+            }
+            processText(detectedText.toString())
+        } finally {
+            textRecognizer.release()
+        }
+    }
+
+    fun processText(extractedText: String){
+        var text = extractedText.trim()
+        var st = (text.split("(")[1]).split(")")
+        Toast.makeText(this, "${st[0]}  ${st[1]}", Toast.LENGTH_SHORT).show()
+        when(st[1].trim()){
+            "2" -> {
+                binaryValue.setText(st[0].trim())
+            }
+            "8" -> {
+                octalValue.setText(st[0].trim())
+            }
+            "10" -> {
+                decimalValue.setText(st[0].trim())
+            }
+            "16" -> {
+                hexDecValue.setText(st[0].trim())
+            }
+            else -> {
+                Toast.makeText(this, "Incorrect base value ${st[1].trim()}", Toast.LENGTH_SHORT).show()}
+        }
+    }
+
+    private fun inspect(uri: Uri) {
+        var `is`: InputStream? = null
+        var bitmap: Bitmap? = null
+        try {
+            `is` = contentResolver.openInputStream(uri)
+            val options = BitmapFactory.Options()
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888
+            options.inSampleSize = 2
+            options.inScreenDensity = DisplayMetrics.DENSITY_LOW
+            bitmap = BitmapFactory.decodeStream(`is`, null, options)
+            inspectFromBitmap(bitmap)
+        } catch (e: FileNotFoundException) {
+            Log.w(
+                "LOG",
+                "Failed to find the file: $uri", e
+            )
+        } finally {
+            bitmap?.recycle()
+            if (`is` != null) {
+                try {
+                    `is`.close()
+                } catch (e: IOException) {
+                    Log.w(
+                        "LOG",
+                        "Failed to close InputStream",
+                        e
+                    )
+                }
+            }
+        }
     }
 }

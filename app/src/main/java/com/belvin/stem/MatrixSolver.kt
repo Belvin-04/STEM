@@ -1,17 +1,39 @@
 package com.belvin.stem
 
+import android.Manifest
+import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.vision.Frame
+import com.google.android.gms.vision.text.TextBlock
+import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.io.InputStream
+import java.util.*
 
 class MatrixSolver : AppCompatActivity() {
 
+    val CAMERA_REQUEST = 1888
+    val MY_CAMERA_PERMISSION_CODE = 100
     var quesMatrix1 = Array(3) { arrayOfNulls<EditText>(3) }
     var quesMatrix2 = Array(3) { arrayOfNulls<EditText>(3) }
     var quesMatrix2T = Array(3) { arrayOfNulls<TextInputLayout>(3) }
@@ -262,22 +284,135 @@ class MatrixSolver : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun openCamera() {
+
+        if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(arrayOf(Manifest.permission.CAMERA),MY_CAMERA_PERMISSION_CODE)
+        }
+        else{
+            val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(intent,CAMERA_REQUEST)
+        }
+
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if(requestCode == MY_CAMERA_PERMISSION_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(intent,CAMERA_REQUEST)
+        }
+        else{
+            Toast.makeText(this, "Please accept all permissions", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        when(requestCode){
+            CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
+                val result = CropImage.getActivityResult(data)
+                if (resultCode === RESULT_OK) {
+                    val resultUri = result.uri
+
+                    inspect(resultUri)
+                    //From here you can load the image however you need to, I recommend using the Glide library
+                } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    val error = result.error
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.matrix_menu,menu)
+        menuInflater.inflate(R.menu.custom_menu,menu)
         return super.onCreateOptionsMenu(menu)
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when(item.itemId){
             R.id.matrixMethod -> {
                 startActivity(Intent(this,InverseMatrixMethod::class.java))
             }
-            R.id.matrixQuiz -> {
-                startActivity(Intent(this,MatrixQuiz::class.java))
+            R.id.scanMatrix -> {
+                CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
             }
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun inspect(uri: Uri) {
+        var `is`: InputStream? = null
+        var bitmap: Bitmap? = null
+        try {
+            `is` = contentResolver.openInputStream(uri)
+            val options = BitmapFactory.Options()
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888
+            options.inSampleSize = 2
+            options.inScreenDensity = DisplayMetrics.DENSITY_LOW
+            bitmap = BitmapFactory.decodeStream(`is`, null, options)
+            inspectFromBitmap(bitmap)
+        } catch (e: FileNotFoundException) {
+            Log.w(
+                "LOG",
+                "Failed to find the file: $uri", e
+            )
+        } finally {
+            bitmap?.recycle()
+            if (`is` != null) {
+                try {
+                    `is`.close()
+                } catch (e: IOException) {
+                    Log.w(
+                        "LOG",
+                        "Failed to close InputStream",
+                        e
+                    )
+                }
+            }
+        }
+    }
+
+    private fun inspectFromBitmap(bitmap: Bitmap?) {
+        val textRecognizer = TextRecognizer.Builder(this).build()
+        try {
+            if (!textRecognizer.isOperational) {
+                AlertDialog.Builder(this)
+                    .setMessage("Text recognizer could not be set up on your device").show()
+                return
+            }
+            val frame = Frame.Builder().setBitmap(bitmap).build()
+            val origTextBlocks = textRecognizer.detect(frame)
+            val textBlocks: MutableList<TextBlock> = ArrayList()
+            for (i in 0 until origTextBlocks.size()) {
+                val textBlock = origTextBlocks.valueAt(i)
+                textBlocks.add(textBlock)
+            }
+            Collections.sort(textBlocks, object : Comparator<TextBlock?> {
+                override fun compare(o1: TextBlock?, o2: TextBlock?): Int {
+                    val diffOfTops = o1!!.boundingBox.top - o2!!.boundingBox.top
+                    val diffOfLefts = o1.boundingBox.left - o2.boundingBox.left
+                    return if (diffOfTops != 0) {
+                        diffOfTops
+                    } else diffOfLefts
+                }
+            })
+            val detectedText = StringBuilder()
+            for (textBlock in textBlocks) {
+                if (textBlock != null && textBlock.value != null) {
+                    detectedText.append(textBlock.value)
+                    detectedText.append("\n")
+                }
+            }
+            Toast.makeText(this,(detectedText.toString()) , Toast.LENGTH_SHORT).show()
+        } finally {
+            textRecognizer.release()
+        }
     }
 }

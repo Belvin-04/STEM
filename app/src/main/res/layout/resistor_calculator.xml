@@ -109,22 +109,14 @@
         android:text="calculate"
         app:layout_constraintTop_toBottomOf="@id/toleranceValue" />
 
-    <Button
-        android:id="@+id/cameraBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Open camera"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/calculateBtn" />
-
     <ImageView
-        android:id="@+id/cameraImg"
-        android:layout_width="240sp"
-        android:layout_height="240sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/imgView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/calculateBtn"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cameraBtn" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

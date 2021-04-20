@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/numberSystemTest"
-        android:title="Test your skill"
+        android:id="@+id/matrixMethod"
+        android:title="Inverse Matrix Method"
         />
-
-    <item
-        android:id="@+id/numberSystemVisualize"
-        android:title="Learn"
+    <item android:id="@+id/scanMatrix" android:title="Scan Question" android:icon="@drawable/scan_drawable_image"
+        app:showAsAction="always"
         />
 </menu>

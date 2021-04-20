@@ -11,11 +11,14 @@ class Home : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home)
 
-        var modulesArray = arrayOf("Resistor Calculator","Number System Converter","K-Map Solver","Matrix")
+        var modulesArray = arrayOf("Resistor","Number System","K-Map","Matrix")
         moduleRecyclerView = findViewById(R.id.moduleRecyclerView)
 
         moduleRecyclerView.layoutManager = LinearLayoutManager(this)
         moduleRecyclerView.adapter = ModuleAdapter(modulesArray)
+
+        var assetManager = assets
+        var tess = TessOCR(assetManager)
 
     }
 }

@@ -1,15 +1,28 @@
 package com.belvin.stem
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.google.android.material.textfield.TextInputLayout
 
 class KMapSolver : AppCompatActivity() {
+
+    val CAMERA_REQUEST = 1888
+    val MY_CAMERA_PERMISSION_CODE = 100
 
     lateinit var aaText:TextView
     lateinit var abText:TextView
@@ -165,5 +178,52 @@ class KMapSolver : AppCompatActivity() {
         abText.setBackgroundColor(Color.WHITE)
         baText.setBackgroundColor(Color.WHITE)
         bbText.setBackgroundColor(Color.WHITE)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun openCamera() {
+
+        if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(arrayOf(Manifest.permission.CAMERA),MY_CAMERA_PERMISSION_CODE)
+        }
+        else{
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(intent,CAMERA_REQUEST)
+        }
+
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if(requestCode == MY_CAMERA_PERMISSION_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(intent,CAMERA_REQUEST)
+        }
+        else{
+            Toast.makeText(this, "Please accept all permissions", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK){
+            val photo = data?.extras?.get("data") as Bitmap
+
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.camera_menu,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.scanQues -> {
+                openCamera()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

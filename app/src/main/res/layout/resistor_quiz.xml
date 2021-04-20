@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ResistorQuiz">
+
+    <TextView
+        android:id="@+id/questionNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1/10"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/resistor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/resistor_blank"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/questionNumber" />
+
+    <ImageView
+        android:id="@+id/f_band"
+        android:layout_width="37dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="82dp"
+        android:src="@drawable/black"
+        app:layout_constraintStart_toStartOf="@id/resistor"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/s_band"
+        android:layout_width="37dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="14dp"
+        android:src="@drawable/black"
+        app:layout_constraintBottom_toBottomOf="@id/f_band"
+        app:layout_constraintStart_toEndOf="@id/f_band"
+        app:layout_constraintTop_toTopOf="@id/f_band" />
+
+    <ImageView
+        android:id="@+id/t_band"
+        android:layout_width="38dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="13dp"
+        android:src="@drawable/black"
+        app:layout_constraintBottom_toBottomOf="@id/s_band"
+        app:layout_constraintStart_toEndOf="@id/s_band"
+        app:layout_constraintTop_toTopOf="@id/s_band" />
+
+    <ImageView
+        android:id="@+id/fo_band"
+        android:layout_width="37dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="16dp"
+        android:src="@drawable/brown"
+        app:layout_constraintBottom_toBottomOf="@id/t_band"
+        app:layout_constraintStart_toEndOf="@id/t_band"
+        app:layout_constraintTop_toTopOf="@id/t_band" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/resistanceValue"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10sp"
+        android:hint="Resistance"
+        android:inputType="number|numberDecimal"
+        android:padding="3sp"
+        app:boxCornerRadiusBottomEnd="10sp"
+        app:boxCornerRadiusBottomStart="10sp"
+        app:boxCornerRadiusTopEnd="10sp"
+        app:boxCornerRadiusTopStart="10sp"
+        app:layout_constraintEnd_toStartOf="@id/unit"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/resistor">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Spinner
+        android:id="@+id/unit"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toBottomOf="@id/resistanceValue"
+        app:layout_constraintEnd_toStartOf="@id/toleranceValue"
+        app:layout_constraintHorizontal_weight="1.5"
+        app:layout_constraintStart_toEndOf="@id/resistanceValue"
+        app:layout_constraintTop_toTopOf="@id/resistanceValue" />
+
+    <Spinner
+        android:id="@+id/toleranceValue"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/unit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="1.5"
+        app:layout_constraintStart_toEndOf="@id/unit"
+        app:layout_constraintTop_toTopOf="@id/unit" />
+
+    <Button
+        android:id="@+id/nextBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="Next"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toleranceValue" />
+
+    <TextView
+        android:id="@+id/temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -21,17 +21,17 @@ class ModuleAdapter(var modules:Array<String>): RecyclerView.Adapter<ModuleAdapt
         val myView = LayoutInflater.from(parent.context).inflate(R.layout.home_layout,parent,false)
         myView.setOnClickListener {
             var text = it.findViewById<TextView>(R.id.moduleName).text
-            if(text == "Resistor Calculator"){
-                parent.context.startActivity(Intent(parent.context,ResistorCalculator::class.java))
+            if(text == "Resistor"){
+                parent.context.startActivity(Intent(parent.context,LearnResistor::class.java))
             }
-            else if(text == "Number System Converter"){
-                parent.context.startActivity(Intent(parent.context,NumberSystemConverter::class.java))
+            else if(text == "Number System"){
+                parent.context.startActivity(Intent(parent.context,LearnNumberSystem::class.java))
             }
-            else if(text == "K-Map Solver"){
-                parent.context.startActivity(Intent(parent.context,KMapSolver::class.java))
+            else if(text == "K-Map"){
+                parent.context.startActivity(Intent(parent.context,LearnKmap::class.java))
             }
             else if(text == "Matrix"){
-                parent.context.startActivity(Intent(parent.context,MatrixSolver::class.java))
+                parent.context.startActivity(Intent(parent.context,LearnMatrix::class.java))
             }
         }
         return ViewHolder(myView)
