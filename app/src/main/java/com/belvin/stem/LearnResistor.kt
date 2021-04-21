@@ -18,7 +18,8 @@ class LearnResistor : AppCompatActivity() {
 
         var learnList = mutableListOf<Pair<String,String>>()
 
-        learnList.add(Pair("Resistor Colour Code","resistor_color_code"))
+        //learnList.add(Pair("Resistor Colour Code","resistor_color_code"))
+        learnList.add(Pair("Resistor Colour Code","https://stem-hosting-bucket.s3.amazonaws.com/resistor_color_code.mkv"))
 
         recyclerView = findViewById(R.id.learnRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)

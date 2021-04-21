@@ -17,21 +17,21 @@ class LearnNumberSystem : AppCompatActivity() {
         setContentView(R.layout.learn_activity)
 
         var learnList = mutableListOf<Pair<String,String>>()
-        learnList.add(Pair("Binary To Octal","binary_to_octal"))
-        learnList.add(Pair("Binary To Decimal","binary_to_decimal"))
-        learnList.add(Pair("Binary To HexaDecimal","binary_to_hex"))
+        learnList.add(Pair("Binary To Octal","https://stem-hosting-bucket.s3.amazonaws.com/binary_to_octal.mkv"))
+        learnList.add(Pair("Binary To Decimal","https://stem-hosting-bucket.s3.amazonaws.com/binary_to_decimal.mkv"))
+        learnList.add(Pair("Binary To HexaDecimal","https://stem-hosting-bucket.s3.amazonaws.com/binary_to_hex.mkv"))
 
-        learnList.add(Pair("Octal To Binary","octal_to_binary"))
-        learnList.add(Pair("Octal To Decimal","octal_to_decimal"))
-        learnList.add(Pair("Octal To HexaDecimal","octal_to_hex"))
+        learnList.add(Pair("Octal To Binary","https://stem-hosting-bucket.s3.amazonaws.com/octal_to_binary.mkv"))
+        learnList.add(Pair("Octal To Decimal","https://stem-hosting-bucket.s3.amazonaws.com/octal_to_decimal.mkv"))
+        learnList.add(Pair("Octal To HexaDecimal","https://stem-hosting-bucket.s3.amazonaws.com/octal_to_hex.mkv"))
 
-        learnList.add(Pair("Decimal To Binary","decimal_to_binary"))
-        learnList.add(Pair("Decimal To Octal","decimal_to_octal"))
-        learnList.add(Pair("Decimal To HexaDecimal","decimal_to_hex"))
+        learnList.add(Pair("Decimal To Binary","https://stem-hosting-bucket.s3.amazonaws.com/decimal_to_binary.mkv"))
+        learnList.add(Pair("Decimal To Octal","https://stem-hosting-bucket.s3.amazonaws.com/decimal_to_octal.mkv"))
+        learnList.add(Pair("Decimal To HexaDecimal","https://stem-hosting-bucket.s3.amazonaws.com/decimal_to_hex.mkv"))
 
-        learnList.add(Pair("HexaDecimal To Binary","hex_to_binary"))
-        learnList.add(Pair("HexaDecimal To Decimal","hex_to_decimal"))
-        learnList.add(Pair("HexaDecimal To Octal","hex_to_octal"))
+        learnList.add(Pair("HexaDecimal To Binary","https://stem-hosting-bucket.s3.amazonaws.com/hex_to_binary.mkv"))
+        learnList.add(Pair("HexaDecimal To Decimal","https://stem-hosting-bucket.s3.amazonaws.com/hex_to_decimal.mkv"))
+        learnList.add(Pair("HexaDecimal To Octal","https://stem-hosting-bucket.s3.amazonaws.com/hex_to_octal.mkv"))
 
         recyclerView = findViewById(R.id.learnRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)

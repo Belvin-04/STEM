@@ -31,6 +31,7 @@ import com.theartofdev.edmodo.cropper.CropImageView
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
+import java.lang.Exception
 import java.util.*
 
 class KMapSolver : AppCompatActivity() {
@@ -294,18 +295,43 @@ class KMapSolver : AppCompatActivity() {
 
     fun processText(extractedText: String){
         var text = extractedText.trim()
-        var aa = text.split("\n")[0][0]
-        var ab = text.split("\n")[0][1]
-        var ba = text.split("\n")[1][0]
-        var bb = text.split("\n")[1][1]
+        var aa = ""
+        var ab = ""
+        var ba = ""
+        var bb = ""
 
-        aaValue.setText(aa.toString())
-        abValue.setText(ab.toString())
-        baValue.setText(ba.toString())
-        bbValue.setText(bb.toString())
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
 
+        try{
 
+            if(text.split("\n")[0].matches(Regex("""(\d)( +)(\d)"""))){
+                aa = text.split("\n")[0].replace(" ","")[0].toString()
+                ab = text.split("\n")[0].replace(" ","")[1].toString()
+            }
 
+            if(text.split("\n")[1].matches(Regex("""(\d)( +)(\d)"""))){
+                ba = text.split("\n")[1].replace(" ","")[0].toString()
+                bb = text.split("\n")[1].replace(" ","")[1].toString()
+            }
+
+            if(text.split("\n")[0].matches(Regex("""(\d)(\d)"""))){
+                aa = text.split("\n")[0][0].toString()
+                ab = text.split("\n")[0][1].toString()
+            }
+
+            if(text.split("\n")[1].matches(Regex("""(\d)(\d)"""))){
+                ba = text.split("\n")[1][0].toString()
+                bb = text.split("\n")[1][1].toString()
+            }
+
+            aaValue.setText(aa)
+            abValue.setText(ab)
+            baValue.setText(ba)
+            bbValue.setText(bb)
+        }
+        catch(e:Exception){
+            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun inspect(uri: Uri) {

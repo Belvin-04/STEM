@@ -18,7 +18,7 @@ class LearnKmap : AppCompatActivity() {
 
         val learnList = mutableListOf<Pair<String,String>>()
 
-        learnList.add(Pair("2 Variable K-Map","kmap_two"))
+        learnList.add(Pair("2 Variable K-Map","https://stem-hosting-bucket.s3.amazonaws.com/kmap_two.mp4"))
 
         recyclerView = findViewById(R.id.learnRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
