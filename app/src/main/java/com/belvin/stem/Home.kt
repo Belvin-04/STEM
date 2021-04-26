@@ -1,7 +1,10 @@
 package com.belvin.stem
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -17,8 +20,20 @@ class Home : AppCompatActivity() {
         moduleRecyclerView.layoutManager = LinearLayoutManager(this)
         moduleRecyclerView.adapter = ModuleAdapter(modulesArray)
 
-        var assetManager = assets
-        var tess = TessOCR(assetManager)
+    }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.quiz_score,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.quizScoreMenu -> {
+                var i = Intent(this,QuizScores::class.java)
+                startActivity(i)
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

@@ -1,10 +1,12 @@
 package com.belvin.stem
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -39,6 +41,8 @@ class ResistorCalculator : AppCompatActivity() {
     lateinit var toleranceSpinner: Spinner
     lateinit var calculateButton: Button
     lateinit var unitSpinner: Spinner
+
+    lateinit var colorCheck:TextView
 
     var fBandNo = 0
     var sBandNo = 0
@@ -97,6 +101,61 @@ class ResistorCalculator : AppCompatActivity() {
             }
         }
     }
+
+    //Red changed
+    val RED1_MIN = Scalar(0.toDouble(), 115.toDouble(), 230.toDouble())
+    val RED1_MAX = Scalar(6.toDouble(), 255.toDouble(), 255.toDouble())
+
+    val ORANGE_MIN = Scalar(7.toDouble(), 150.toDouble(), 150.toDouble())
+    val ORANGE_MAX = Scalar(18.toDouble(), 250.toDouble(), 250.toDouble())
+
+    //Yellow changed
+    val YELLOW_MIN = Scalar(25.toDouble(), 130.toDouble(), 100.toDouble())
+    val YELLOW_MAX = Scalar(34.toDouble(), 255.toDouble(), 255.toDouble())
+
+    val GREEN_MIN = Scalar(35.toDouble(), 60.toDouble(), 60.toDouble())
+    val GREEN_MAX = Scalar(75.toDouble(), 250.toDouble(), 150.toDouble())
+
+    val BLUE_MIN = Scalar(82.toDouble(), 60.toDouble(), 49.toDouble())
+    val BLUE_MAX = Scalar(128.toDouble(), 255.toDouble(), 255.toDouble())
+
+    val VIOLET_MIN = Scalar(129.toDouble(), 60.toDouble(), 50.toDouble())
+    val VIOLET_MAX = Scalar(165.toDouble(), 250.toDouble(), 150.toDouble())
+
+    /**
+     * Red wraps around and is therefore defined twice
+     */
+    //Red changed
+    val RED2_MIN = Scalar(175.toDouble(), 235.toDouble(), 240.toDouble())
+    val RED2_MAX = Scalar(180.toDouble(), 255.toDouble(), 255.toDouble())
+
+    val BLACK_MIN = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble())
+    val BLACK_MAX = Scalar(180.toDouble(), 250.toDouble(), 40.toDouble())
+
+    //Brown changed
+    val BROWN_MIN = Scalar(0.toDouble(), 31.toDouble(), 41.toDouble())
+    val BROWN_MAX = Scalar(25.toDouble(), 250.toDouble(), 165.toDouble())
+
+    val GREY_MIN = Scalar(0.toDouble(), 0.toDouble(), 41.toDouble())
+    val GREY_MAX = Scalar(180.toDouble(), 30.toDouble(), 130.toDouble())
+
+    val WHITE_MIN = Scalar(0.toDouble(), 0.toDouble(), 150.toDouble())
+    val WHITE_MAX = Scalar(180.toDouble(), 30.toDouble(), 255.toDouble())
+
+    val GOLD_MIN = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble()) //// TODO:
+
+    val GOLD_MAX = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble())
+
+    val SILVER_MIN = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble()) //// TODO:
+
+    val SILVER_MAX = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble())
+
+    /**
+     * This color (black) is used for unknown color values
+     * when converting from color names to colors
+     */
+    val UNKNOWN = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble())
+
     override fun onResume() {
         super.onResume()
         if (!OpenCVLoader.initDebug()) {
@@ -125,6 +184,7 @@ class ResistorCalculator : AppCompatActivity() {
         calculateButton = findViewById(R.id.calculateBtn)
         unitSpinner = findViewById(R.id.unit)
         img = findViewById(R.id.imgView)
+        colorCheck = findViewById(R.id.colorCheck)
 
         unitSpinner.adapter = ArrayAdapter(
             this,
@@ -262,7 +322,7 @@ class ResistorCalculator : AppCompatActivity() {
 
         if (requestCode == MY_CAMERA_PERMISSION_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-                requestPermissions(arrayOf(Manifest.permission.CAMERA),MY_CAMERA_PERMISSION_CODE)
+                requestPermissions(arrayOf(Manifest.permission.CAMERA), MY_CAMERA_PERMISSION_CODE)
             }
             else{
                 CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
@@ -272,16 +332,58 @@ class ResistorCalculator : AppCompatActivity() {
         }
     }
 
+    
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val result = CropImage.getActivityResult(data)
             val resultUri = result.uri
             val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, resultUri)
-
             val bitmap1 = grabcutAlgo(bitmap)
+            var resizedBitmap = Bitmap.createScaledBitmap(
+                bitmap1, 1000, 600, false
+            );
+            img.setImageBitmap(resizedBitmap)
 
-            img.setImageBitmap(bitmap1)
-            //val photo = data?.extras?.get("data") as Bitmap
+            img.setOnTouchListener{ _, event ->
+                var x = event.x.toInt()
+                var y = event.y.toInt()
+
+                if(x < 0){
+                    x = 0;
+                }else if(x > resizedBitmap.width -1){
+                    x = resizedBitmap.width-1
+                }
+
+                if(y < 0){
+                    y = 0;
+                }else if(y > resizedBitmap.height -1){
+                    y = resizedBitmap.height-1
+                }
+
+                val pixel: Int = resizedBitmap.getPixel(x, y)
+
+                val redValue: Int = Color.red(pixel)
+                val blueValue: Int = Color.blue(pixel)
+                val greenValue: Int = Color.green(pixel)
+
+
+                colorCheck.setTextColor(pixel)
+
+                var hsv = FloatArray(3)
+                //var currentColor = Color.rgb(redValue,greenValue,blueValue)
+                //Color.colorToHSV(currentColor,hsv)
+                Color.RGBToHSV(redValue,greenValue,blueValue,hsv)
+
+                colorCheck.setText("RGB($redValue, $greenValue, $blueValue)\nHSV(${hsv[0]/2}, ${hsv[1]*255}, ${hsv[2]*255})\n" +
+                        "HSV(${hsv[0]}, ${hsv[1]}, ${hsv[2]})")
+                var colorName = getColorName(Scalar(hsv[0].toDouble()/2,hsv[1].toDouble()*255,hsv[2].toDouble()*255))
+                Toast.makeText(this, colorName, Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "$redValue, $blueValue, $greenValue", Toast.LENGTH_SHORT).show()
+
+                false
+            }
 
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -356,15 +458,95 @@ class ResistorCalculator : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.scanQues -> {
-                if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-                    requestPermissions(arrayOf(Manifest.permission.CAMERA),MY_CAMERA_PERMISSION_CODE)
-                }
-                else{
+                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(
+                        arrayOf(Manifest.permission.CAMERA),
+                        MY_CAMERA_PERMISSION_CODE
+                    )
+                } else {
                     CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this)
                 }
             }
         }
         return super.onOptionsItemSelected(item)
     }
+
+
+    private fun isScalarBetweenBounds(
+        scalar: Scalar?,
+        lowerBound: Scalar?,
+        upperBound: Scalar?
+    ): Boolean {
+        require(!(scalar == null || lowerBound == null || upperBound == null)) { "scalars must not be null!" }
+        if (lowerBound.`val`.size != upperBound.`val`.size) System.err.println("upper and lower bound size mismatch")
+        if (scalar.`val`.size != lowerBound.`val`.size) System.err.println("scalar and bounds size mismatch")
+        for (i in scalar.`val`.indices) {
+            if (scalar.`val`[i] < lowerBound.`val`[i] || scalar.`val`[i] > upperBound.`val`[i]) {
+                return false
+            }
+        }
+        return true
+    }
+
+    fun getColorName(colorHsv: Scalar?): String? {
+        requireNotNull(colorHsv) { "colorHsv must not be null!" }
+        var name = ""
+        if (isScalarBetweenBounds(colorHsv, RED1_MIN, RED1_MAX) ||
+            isScalarBetweenBounds(colorHsv, RED2_MIN, RED2_MAX)
+        ) {
+            if (name != "") Toast.makeText(this,"overlapping colorHsv name definitions (" + name + " and " + "Red" + ")!",Toast.LENGTH_SHORT).show()
+            name = "Red"
+        }
+        if (isScalarBetweenBounds(colorHsv, ORANGE_MIN, ORANGE_MAX)) {
+            if (name != "") Toast.makeText(this,"overlapping colorHsv name definitions (" + name + " and " + "Orange" + ")!",Toast.LENGTH_SHORT).show()
+            name = "Orange"
+        }
+        if (isScalarBetweenBounds(colorHsv, YELLOW_MIN, YELLOW_MAX)) {
+            if (name != "") Toast.makeText(this,"overlapping colorHsv name definitions (" + name + " and " + "Yellow" + ")!",Toast.LENGTH_SHORT).show()
+            name = "Yellow"
+        }
+        if (isScalarBetweenBounds(colorHsv, GREEN_MIN, GREEN_MAX)) {
+            if (name != "") Toast.makeText(this,"overlapping colorHsv name definitions (" + name + " and " + "Green" + ")!",Toast.LENGTH_SHORT).show()
+            name = "Green"
+        }
+        if (isScalarBetweenBounds(colorHsv, BLUE_MIN, BLUE_MAX)) {
+            if (name != "") Toast.makeText(this,"overlapping colorHsv name definitions (" + name + " and " + "Blue" + ")!",Toast.LENGTH_SHORT).show()
+            name = "Blue"
+        }
+        if (isScalarBetweenBounds(colorHsv, VIOLET_MIN, VIOLET_MAX)) {
+            if (name != "") Toast.makeText(this,"overlapping colorHsv name definitions (" + name + " and " + "Violet" + ")!",Toast.LENGTH_SHORT).show()
+            name = "Violet"
+        }
+        if (isScalarBetweenBounds(colorHsv, BROWN_MIN, BROWN_MAX)) {
+            if (name != "") Toast.makeText(this,"overlapping colorHsv name definitions (" + name + " and " + "Brown" + ")!",Toast.LENGTH_SHORT).show()
+            name = "Brown"
+        }
+        if (isScalarBetweenBounds(colorHsv, BLACK_MIN, BLACK_MAX)) {
+            if (name != "") Toast.makeText(this,"overlapping colorHsv name definitions (" + name + " and " + "Black" + ")!",Toast.LENGTH_SHORT).show()
+            name = "Black"
+        }
+        if (isScalarBetweenBounds(colorHsv, GREY_MIN, GREY_MAX)) {
+            if (name != "") Toast.makeText(this,"overlapping colorHsv name definitions (" + name + " and " + "Grey" + ")!",Toast.LENGTH_SHORT).show()
+            name = "Grey"
+        }
+        if (isScalarBetweenBounds(colorHsv, WHITE_MIN, WHITE_MAX)) {
+            if (name != "") Toast.makeText(this,"overlapping colorHsv name definitions (" + name + " and " + "White" + ")!",Toast.LENGTH_SHORT).show()
+            name = "White"
+        }
+
+        /*
+        if(isScalarBetweenBounds(colorHsv, GOLD_MIN, GOLD_MAX)){
+            if(name != ColorName.Unknown)
+                System.err.println("overlapping colorHsv name definitions (" + name + " and " + ColorName.Gold + ")!");
+            name = ColorName.Gold;
+        }
+        if(isScalarBetweenBounds(colorHsv, SILVER_MIN, SILVER_MAX)){
+            if(name != ColorName.Unknown)
+                System.err.println("overlapping colorHsv name definitions (" + name + " and " + ColorName.Silver + ")!");
+            name = ColorName.Silver;
+        }
+        */return name
+    }
+
 
 }

@@ -408,9 +408,13 @@ class MatrixSolver : AppCompatActivity() {
                     detectedText.append("\n")
                 }
             }
-            Toast.makeText(this,(detectedText.toString()) , Toast.LENGTH_SHORT).show()
+            processText(detectedText.toString())
         } finally {
             textRecognizer.release()
         }
+    }
+
+    private fun processText(extractedText: String) {
+        Toast.makeText(this, extractedText, Toast.LENGTH_SHORT).show()
     }
 }

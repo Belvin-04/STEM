@@ -1,14 +1,17 @@
 package com.belvin.stem
 
+import android.content.ContentValues
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
+import org.opencv.core.Scalar
 import kotlin.math.pow
+
 
 class NumberSystemGameMode : AppCompatActivity() {
     lateinit var decimalValue: EditText
@@ -21,6 +24,9 @@ class NumberSystemGameMode : AppCompatActivity() {
     var givenAnswers = mutableListOf<String>()
     var questionNumberValue = 1
     var score = 0
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.number_system_game_mode)
@@ -55,21 +61,49 @@ class NumberSystemGameMode : AppCompatActivity() {
                     .setPositiveButton("OK") { dialog, which ->
                         MaterialAlertDialogBuilder(this)
                             .setTitle("Want to take the test again ?")
-                            .setMessage("Click YES to take the test again or click No to discard the message")
+                            .setMessage(getMessage(getQuizScore(),score))
                             .setPositiveButton("YES") { dialog1, which1 ->
+                                if(score > getQuizScore()){
+                                    updateQuizScore(score)
+                                }
+                                score = 0
                                 questionNumberValue = 1
                                 questionNumber.setText("${questionNumberValue}/10")
                                 nextButton.setText("Next")
                                 nextQuestion()
                             }
                             .setNegativeButton("NO"){ dialog1, which1 ->
-                                startActivity(Intent(this,Home::class.java))
+                                if(score > getQuizScore()){
+                                    updateQuizScore(score)
+                                }
+                                startActivity(Intent(this, Home::class.java))
                             }
                             .show()
                     }
                     .show()
             }
         }
+    }
+
+    private fun getMessage(previousScore:Int,currentScore:Int): String {
+        var message = ""
+        if(currentScore == 10 && previousScore == 10){
+            message = "Keep up the 10 streak"
+        }
+        else if(currentScore == 10){
+            message = "A perfect 10"
+        }
+        else if(currentScore < previousScore){
+            message = "Looks like you have not being studying lately..."
+        }
+        else if(currentScore > previousScore){
+            message = "HardWork definitely pays off..."
+        }
+        else{
+            message = "Keep working hard..."
+        }
+        message = message + "\nPress Yes to retake the quiz or press No to go to the home page."
+        return message
     }
 
     fun nextQuestion(){
@@ -106,7 +140,7 @@ class NumberSystemGameMode : AppCompatActivity() {
         }
     }
 
-    fun decimalToBinary(num:Long):String{
+    fun decimalToBinary(num: Long):String{
         var n = num
         val binaryNum = mutableListOf<Long>()
         var binaryAns = ""
@@ -117,7 +151,7 @@ class NumberSystemGameMode : AppCompatActivity() {
                 binaryNum.add(n)
                 break
             }
-            binaryNum.add(n%2)
+            binaryNum.add(n % 2)
             n /= 2
         }
 
@@ -139,7 +173,7 @@ class NumberSystemGameMode : AppCompatActivity() {
                 octalNum.add(n)
                 break
             }
-            octalNum.add(n%8)
+            octalNum.add(n % 8)
             n /= 8
         }
 
@@ -151,7 +185,7 @@ class NumberSystemGameMode : AppCompatActivity() {
 
     }
 
-    fun decimalToHEX(num:Long):String{
+    fun decimalToHEX(num: Long):String{
         var n = num
         val hexNum = mutableListOf<Any>()
         var hexAns = ""
@@ -181,7 +215,7 @@ class NumberSystemGameMode : AppCompatActivity() {
                 hexNum.add("F")
             }
             else{
-                hexNum.add(n%16)
+                hexNum.add(n % 16)
             }
             n /= 16
         }
@@ -193,7 +227,7 @@ class NumberSystemGameMode : AppCompatActivity() {
         return hexAns
     }
 
-    fun binaryToDecimal(num:String):String{
+    fun binaryToDecimal(num: String):String{
         var sum = 0
         var binaryArray = convertToList(num).asReversed()
 
@@ -205,7 +239,7 @@ class NumberSystemGameMode : AppCompatActivity() {
         return (sum.toString())
     }
 
-    fun octalToDecimal(num:String):String{
+    fun octalToDecimal(num: String):String{
         var sum = 0
         var octalArray = convertToList(num).asReversed()
 
@@ -217,7 +251,7 @@ class NumberSystemGameMode : AppCompatActivity() {
         return (sum.toString())
     }
 
-    fun hexToDecimal(num:String):String{
+    fun hexToDecimal(num: String):String{
         var sum = 0
         var hexDecArray = convertToList(num).asReversed()
 
@@ -250,11 +284,25 @@ class NumberSystemGameMode : AppCompatActivity() {
         return (sum.toString())
     }
 
-    fun convertToList(chars:String):MutableList<String>{
+    fun convertToList(chars: String):MutableList<String>{
         var tempArray = mutableListOf<String>()
         for(c in chars){
             tempArray.add(c.toString())
         }
         return  tempArray
+    }
+
+    fun updateQuizScore(score:Int){
+        var db = STEMDatabase(this).readableDatabase
+        var cv = ContentValues()
+        cv.put("numberSystemScore",score)
+        db.update("quizScores",cv,null,null)
+    }
+
+    fun getQuizScore():Int{
+        var db = STEMDatabase(this).readableDatabase
+        var scoreCur = db.rawQuery("SELECT numberSystemScore FROM quizScores",null)
+        scoreCur.moveToFirst()
+        return scoreCur.getInt(0)
     }
 }

@@ -1,5 +1,6 @@
 package com.belvin.stem
 
+import android.content.ContentValues
 import com.googlecode.tesseract.android.TessBaseAPI;
 import android.content.Intent
 import android.os.Build
@@ -76,14 +77,21 @@ class ResistorQuiz : AppCompatActivity() {
                         .setPositiveButton("OK") { dialog, which ->
                             MaterialAlertDialogBuilder(this)
                                 .setTitle("Want to take the test again ?")
-                                .setMessage("Click YES to take the test again or click No to discard the message")
+                                .setMessage(getMessage(getQuizScore(),score))
                                 .setPositiveButton("YES") { dialog1, which1 ->
+                                    if(score > getQuizScore()){
+                                        updateQuizScore(score)
+                                    }
+                                    score = 0
                                     questionNumberValue = 1
                                     questionNumber.setText("${questionNumberValue}/10")
                                     nextBtn.setText("Next")
                                     nextQuestion()
                                 }
                                 .setNegativeButton("NO"){ dialog1, which1 ->
+                                    if(score > getQuizScore()){
+                                        updateQuizScore(score)
+                                    }
                                     startActivity(Intent(this,Home::class.java))
                                 }
                                 .show()
@@ -94,7 +102,28 @@ class ResistorQuiz : AppCompatActivity() {
 
         }
 
-        fun calculate(){
+    private fun getMessage(previousScore:Int,currentScore:Int): String {
+        var message = ""
+        if(currentScore == 10 && previousScore == 10){
+            message = "Keep up the 10 streak"
+        }
+        else if(currentScore == 10){
+            message = "A perfect 10"
+        }
+        else if(currentScore < previousScore){
+            message = "Looks like you have not being studying lately..."
+        }
+        else if(currentScore > previousScore){
+            message = "HardWork definitely pays off..."
+        }
+        else{
+            message = "Keep working hard..."
+        }
+        message = message + "\nPress Yes to retake the quiz or press No to go to the home page."
+        return message
+    }
+
+    fun calculate(){
 
             var resistance = ""
             var unit = ""
@@ -169,4 +198,19 @@ class ResistorQuiz : AppCompatActivity() {
         }
         generateRandomNumber()
     }
+
+    fun updateQuizScore(score:Int){
+        var db = STEMDatabase(this).readableDatabase
+        var cv = ContentValues()
+        cv.put("resistorScore",score)
+        db.update("quizScores",cv,null,null)
+    }
+
+    fun getQuizScore():Int{
+        var db = STEMDatabase(this).readableDatabase
+        var scoreCur = db.rawQuery("SELECT resistorScore FROM quizScores",null)
+        scoreCur.moveToFirst()
+        return scoreCur.getInt(0)
+    }
+
 }

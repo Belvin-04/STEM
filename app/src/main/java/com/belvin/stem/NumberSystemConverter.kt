@@ -22,7 +22,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.belvin.stem.TessOCR.DATA_PATH
+//import com.belvin.stem.TessOCR.DATA_PATH
 import com.google.android.gms.vision.Frame
 import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
@@ -384,14 +384,14 @@ class NumberSystemConverter : AppCompatActivity() {
         }
     }
 
-    fun extractText(bitmap: Bitmap):String{
+    /*fun extractText(bitmap: Bitmap):String{
         var tessBaseAPI = TessBaseAPI()
         tessBaseAPI.init(DATA_PATH, "eng")
         tessBaseAPI.setImage(bitmap)
         var extractedText = tessBaseAPI.utF8Text
         tessBaseAPI.end()
         return extractedText
-    }
+    }*/
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
