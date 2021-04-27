@@ -127,15 +127,20 @@ class NumberSystemGameMode : AppCompatActivity() {
         when(randomChoice){
             1 -> {
                 decimalValue.setText(randomNumber.toString())
+                disableField("decimal")
+
             }
             2 -> {
                 binaryValue.setText(decimalToBinary(randomNumber.toLong()))
+                disableField("binary")
             }
             3 -> {
                 octalValue.setText(decimalToOctal(randomNumber.toLong()))
+                disableField("octal")
             }
             4 -> {
                 hexDecValue.setText(decimalToHEX(randomNumber.toLong()))
+                disableField("hexDec")
             }
         }
     }
@@ -304,5 +309,31 @@ class NumberSystemGameMode : AppCompatActivity() {
         var scoreCur = db.rawQuery("SELECT numberSystemScore FROM quizScores",null)
         scoreCur.moveToFirst()
         return scoreCur.getInt(0)
+    }
+
+    fun disableField(field:String){
+        enableAllField()
+        when(field){
+            "binary" -> {
+                binaryValue.isEnabled = false
+            }
+            "octal" -> {
+                octalValue.isEnabled = false
+            }
+            "decimal" -> {
+                decimalValue.isEnabled = false
+            }
+            "hexDec" -> {
+                hexDecValue.isEnabled = false
+            }
+        }
+    }
+
+    fun enableAllField(){
+        binaryValue.isEnabled = true
+        octalValue.isEnabled = true
+        decimalValue.isEnabled = true
+        hexDecValue.isEnabled = true
+
     }
 }

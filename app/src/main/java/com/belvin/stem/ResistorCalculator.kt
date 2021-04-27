@@ -3,6 +3,7 @@ package com.belvin.stem
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -17,6 +18,7 @@ import android.view.MenuItem
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
@@ -106,8 +108,9 @@ class ResistorCalculator : AppCompatActivity() {
     val RED1_MIN = Scalar(0.toDouble(), 115.toDouble(), 230.toDouble())
     val RED1_MAX = Scalar(6.toDouble(), 255.toDouble(), 255.toDouble())
 
-    val ORANGE_MIN = Scalar(7.toDouble(), 150.toDouble(), 150.toDouble())
-    val ORANGE_MAX = Scalar(18.toDouble(), 250.toDouble(), 250.toDouble())
+    //Orange changed
+    val ORANGE_MIN = Scalar(7.toDouble(), 130.toDouble(), 237.toDouble())
+    val ORANGE_MAX = Scalar(18.toDouble(), 255.toDouble(), 255.toDouble())
 
     //Yellow changed
     val YELLOW_MIN = Scalar(25.toDouble(), 130.toDouble(), 100.toDouble())
@@ -122,9 +125,6 @@ class ResistorCalculator : AppCompatActivity() {
     val VIOLET_MIN = Scalar(129.toDouble(), 60.toDouble(), 50.toDouble())
     val VIOLET_MAX = Scalar(165.toDouble(), 250.toDouble(), 150.toDouble())
 
-    /**
-     * Red wraps around and is therefore defined twice
-     */
     //Red changed
     val RED2_MIN = Scalar(175.toDouble(), 235.toDouble(), 240.toDouble())
     val RED2_MAX = Scalar(180.toDouble(), 255.toDouble(), 255.toDouble())
@@ -142,19 +142,13 @@ class ResistorCalculator : AppCompatActivity() {
     val WHITE_MIN = Scalar(0.toDouble(), 0.toDouble(), 150.toDouble())
     val WHITE_MAX = Scalar(180.toDouble(), 30.toDouble(), 255.toDouble())
 
-    val GOLD_MIN = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble()) //// TODO:
-
+    /*          TODO
+    val GOLD_MIN = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble())
     val GOLD_MAX = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble())
 
-    val SILVER_MIN = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble()) //// TODO:
+    val SILVER_MIN = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble())
+    val SILVER_MAX = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble())*/
 
-    val SILVER_MAX = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble())
-
-    /**
-     * This color (black) is used for unknown color values
-     * when converting from color names to colors
-     */
-    val UNKNOWN = Scalar(0.toDouble(), 0.toDouble(), 0.toDouble())
 
     override fun onResume() {
         super.onResume()
@@ -345,7 +339,7 @@ class ResistorCalculator : AppCompatActivity() {
                 bitmap1, 1000, 600, false
             );
             img.setImageBitmap(resizedBitmap)
-
+            var bandNo = 1
             img.setOnTouchListener{ _, event ->
                 var x = event.x.toInt()
                 var y = event.y.toInt()
@@ -380,8 +374,266 @@ class ResistorCalculator : AppCompatActivity() {
                         "HSV(${hsv[0]}, ${hsv[1]}, ${hsv[2]})")
                 var colorName = getColorName(Scalar(hsv[0].toDouble()/2,hsv[1].toDouble()*255,hsv[2].toDouble()*255))
                 Toast.makeText(this, colorName, Toast.LENGTH_SHORT).show()
-                //Toast.makeText(this, "$redValue, $blueValue, $greenValue", Toast.LENGTH_SHORT).show()
 
+                if(colorName!!.isNotEmpty()){
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle("Color Confirmation")
+                        .setMessage("Detected color was ${colorName}.\nSelect this color for band ${bandNo}")
+                        .setPositiveButton("Yes") { dialog, which ->
+                            when(bandNo){
+                                1 -> {
+                                    when (colorName) {
+                                        "Black" -> {
+                                            fBandNo = 0
+                                            fBand.setImageResource(normalBandArray[fBandNo])
+                                            calculate()
+                                        }
+                                        "Brown" -> {
+                                            fBandNo = 1
+                                            fBand.setImageResource(normalBandArray[fBandNo])
+                                            calculate()
+                                        }
+                                        "Red" -> {
+                                            fBandNo = 2
+                                            fBand.setImageResource(normalBandArray[fBandNo])
+                                            calculate()
+                                        }
+                                        "Orange" -> {
+                                            fBandNo = 3
+                                            fBand.setImageResource(normalBandArray[fBandNo])
+                                            calculate()
+                                        }
+                                        "Yellow" -> {
+                                            fBandNo = 4
+                                            fBand.setImageResource(normalBandArray[fBandNo])
+                                            calculate()
+                                        }
+                                        "Green" -> {
+                                            fBandNo = 5
+                                            fBand.setImageResource(normalBandArray[fBandNo])
+                                            calculate()
+                                        }
+                                        "Blue" -> {
+                                            fBandNo = 6
+                                            fBand.setImageResource(normalBandArray[fBandNo])
+                                            calculate()
+                                        }
+                                        "Violet" -> {
+                                            fBandNo = 7
+                                            fBand.setImageResource(normalBandArray[fBandNo])
+                                            calculate()
+                                        }
+                                        "Grey" -> {
+                                            fBandNo = 8
+                                            fBand.setImageResource(normalBandArray[fBandNo])
+                                            calculate()
+                                        }
+                                        "White" -> {
+                                            fBandNo = 9
+                                            fBand.setImageResource(normalBandArray[fBandNo])
+                                            calculate()
+                                        }
+                                        "Gold" -> {
+                                            Toast.makeText(this, "Gold cant be set on 1st band", Toast.LENGTH_SHORT).show()
+                                        }
+                                        "Silver" -> {
+                                            Toast.makeText(this, "Silver cant be set on 1st band", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }
+                                2 -> {
+                                    when(colorName){
+                                        "Black" -> {
+                                            sBandNo = 0
+                                            sBand.setImageResource(normalBandArray[sBandNo])
+                                            calculate()
+                                        }
+                                        "Brown" -> {
+                                            sBandNo = 1
+                                            sBand.setImageResource(normalBandArray[sBandNo])
+                                            calculate()
+                                        }
+                                        "Red" -> {
+                                            sBandNo = 2
+                                            sBand.setImageResource(normalBandArray[sBandNo])
+                                            calculate()
+                                        }
+                                        "Orange" -> {
+                                            sBandNo = 3
+                                            sBand.setImageResource(normalBandArray[sBandNo])
+                                            calculate()
+                                        }
+                                        "Yellow" -> {
+                                            sBandNo = 4
+                                            sBand.setImageResource(normalBandArray[sBandNo])
+                                            calculate()
+                                        }
+                                        "Green" -> {
+                                            sBandNo = 5
+                                            sBand.setImageResource(normalBandArray[sBandNo])
+                                            calculate()
+                                        }
+                                        "Blue" -> {
+                                            sBandNo = 6
+                                            sBand.setImageResource(normalBandArray[sBandNo])
+                                            calculate()
+                                        }
+                                        "Violet" -> {
+                                            sBandNo = 7
+                                            sBand.setImageResource(normalBandArray[sBandNo])
+                                            calculate()
+                                        }
+                                        "Grey" -> {
+                                            sBandNo = 8
+                                            sBand.setImageResource(normalBandArray[sBandNo])
+                                            calculate()
+                                        }
+                                        "White" -> {
+                                            sBandNo = 9
+                                            sBand.setImageResource(normalBandArray[sBandNo])
+                                            calculate()
+                                        }
+                                        "Gold" -> {
+                                            Toast.makeText(this, "Gold cant be set on 2nd band", Toast.LENGTH_SHORT).show()
+                                            bandNo--
+                                        }
+                                        "Silver" -> {
+                                            Toast.makeText(this, "Silver cant be set on 2nd band", Toast.LENGTH_SHORT).show()
+                                            bandNo--
+                                        }
+                                    }
+                                }
+                                3 -> {
+                                    when(colorName){
+                                        "Black" -> {
+                                            tBandNo = 0
+                                            tBand.setImageResource(multiplierBandArray[tBandNo])
+                                            calculate()
+                                        }
+                                        "Brown" -> {
+                                            tBandNo = 1
+                                            tBand.setImageResource(multiplierBandArray[tBandNo])
+                                            calculate()
+                                        }
+                                        "Red" -> {
+                                            tBandNo = 2
+                                            tBand.setImageResource(multiplierBandArray[tBandNo])
+                                            calculate()
+                                        }
+                                        "Orange" -> {
+                                            tBandNo = 3
+                                            tBand.setImageResource(multiplierBandArray[tBandNo])
+                                            calculate()
+                                        }
+                                        "Yellow" -> {
+                                            tBandNo = 4
+                                            tBand.setImageResource(multiplierBandArray[tBandNo])
+                                            calculate()
+                                        }
+                                        "Green" -> {
+                                            tBandNo = 5
+                                            tBand.setImageResource(multiplierBandArray[tBandNo])
+                                            calculate()
+                                        }
+                                        "Blue" -> {
+                                            tBandNo = 6
+                                            tBand.setImageResource(multiplierBandArray[tBandNo])
+                                            calculate()
+                                        }
+                                        "Violet" -> {
+                                            tBandNo = 7
+                                            tBand.setImageResource(multiplierBandArray[tBandNo])
+                                            calculate()
+                                        }
+                                        "Grey" -> {
+                                            tBandNo = 8
+                                            tBand.setImageResource(multiplierBandArray[tBandNo])
+                                            calculate()
+                                        }
+                                        "White" -> {
+                                            tBandNo = 9
+                                            tBand.setImageResource(multiplierBandArray[tBandNo])
+                                            calculate()
+                                        }
+                                        "Gold" -> {
+                                            tBandNo = 10
+                                            tBand.setImageResource(multiplierBandArray[tBandNo])
+                                            calculate()
+                                        }
+                                        "Silver" -> {
+                                            tBandNo = 11
+                                            tBand.setImageResource(multiplierBandArray[tBandNo])
+                                            calculate()
+                                        }
+                                    }
+                                }
+                                4 -> {
+                                    bandNo = 0
+                                    when(colorName){
+                                        "Black" -> {
+                                            Toast.makeText(this, "Black cant be set on 4th band", Toast.LENGTH_SHORT).show()
+                                            bandNo--
+                                        }
+                                        "Brown" -> {
+                                            foBandNo = 0
+                                            foBand.setImageResource(toleranceBandArray[foBandNo])
+                                            calculate()
+                                        }
+                                        "Red" -> {
+                                            foBandNo = 1
+                                            foBand.setImageResource(toleranceBandArray[foBandNo])
+                                            calculate()
+                                        }
+                                        "Orange" -> {
+                                            Toast.makeText(this, "Orange cant be set on 4th band", Toast.LENGTH_SHORT).show()
+                                            bandNo--
+                                        }
+                                        "Yellow" -> {
+                                            Toast.makeText(this, "Yellow cant be set on 4th band", Toast.LENGTH_SHORT).show()
+                                            bandNo--
+                                        }
+                                        "Green" -> {
+                                            foBandNo = 2
+                                            foBand.setImageResource(toleranceBandArray[foBandNo])
+                                            calculate()
+                                        }
+                                        "Blue" -> {
+                                            foBandNo = 3
+                                            foBand.setImageResource(toleranceBandArray[foBandNo])
+                                            calculate()
+                                        }
+                                        "Violet" -> {
+                                            foBandNo = 4
+                                            foBand.setImageResource(toleranceBandArray[foBandNo])
+                                            calculate()
+                                        }
+                                        "Grey" -> {
+                                            foBandNo = 5
+                                            foBand.setImageResource(toleranceBandArray[foBandNo])
+                                            calculate()
+                                        }
+                                        "White" -> {
+                                            Toast.makeText(this, "White cant be set on 4th band", Toast.LENGTH_SHORT).show()
+                                            bandNo--
+                                        }
+                                        "Gold" -> {
+                                            foBandNo = 6
+                                            foBand.setImageResource(toleranceBandArray[foBandNo])
+                                            calculate()
+                                        }
+                                        "Silver" -> {
+                                            foBandNo = 7
+                                            foBand.setImageResource(toleranceBandArray[foBandNo])
+                                            calculate()
+                                        }
+                                    }
+                                }
+                            }
+                            bandNo++
+                        }
+                        .setNegativeButton("No") { _, _ -> }
+                        .show()
+                }
                 false
             }
 
